@@ -1,4 +1,7 @@
-import { SudokuBlock, SudokuGroup, SudokuIndex, SudokuNumber } from "./types";
+export interface SudokuBlock {
+  value: number | null;
+  group: string | null;
+}
 
 export const defaultBlock: SudokuBlock = {
   value: null,
@@ -6,13 +9,35 @@ export const defaultBlock: SudokuBlock = {
 };
 
 export type SudoKuFieldType = Array<Array<SudokuBlock>>;
-export const createSudokuField = (): SudoKuFieldType => Array(9).map(() => Array(9).map(() => ({ ...defaultBlock })));
+
+export const calculateGroup = (i: number, j: number): string => {
+  // g_0.0 g_0.1 g_0.2
+  // g_1.0 g_1.1 g_1.2
+  // g_2.0 g_2.1 g_2.2
+  return `g_${Math.floor(i/3)}.${Math.floor(j/3)}`
+};
+
+export const createSudokuField = (): SudoKuFieldType => (
+  Array(9).fill(null).map((_, i) => (
+    Array(9).fill(null).map((_, j)  => (
+      { ...defaultBlock, group: calculateGroup(i, j) }
+    ))
+  ))
+);
+/**
+ * [
+ *  [
+ *    { value: null, group: null },
+ *    ...
+ *  ]
+ * ]
+ */
 
 export interface VerifyProps {
-  value: SudokuNumber,
-  rowNum: SudokuIndex,
-  colNum: SudokuIndex,
-  group: SudokuGroup,
+  value: number,
+  rowNum: number,
+  colNum: number,
+  group: string,
   sudokuField: SudoKuFieldType,
 }
 export type VerifyByRowProps = Omit<VerifyProps, "colNum" | "group"> & Partial<Pick<VerifyProps, "colNum" | "group">>;
